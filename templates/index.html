@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product List</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        input[type="text"] {
+            padding: 8px;
+            width: 200px;
+            margin-bottom: 20px;
+        }
+        .search-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Product List</h1>
+    
+    <div class="search-container">
+        <label for="search-bar">Search Products:</label>
+        <input type="text" id="search-bar" placeholder="Search by product name" oninput="searchProducts()">
+    </div>
+
+    <table id="product-table">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Product Name</th>
+                <th>Category</th>
+                <th>Discounted Price</th>
+                <th>Actual Price</th>
+                <th>Discount Percentage</th>
+                <th>Rating</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Products will be populated here -->
+        </tbody>
+    </table>
+
+    <script>
+        // Fetch and display products
+        async function fetchProducts() {
+            const response = await fetch("/product");
+            const products = await response.json();
+            displayProducts(products);
+        }
+
+        // Display products in the table
+        function displayProducts(products) {
+            const tableBody = document.querySelector("#product-table tbody");
+            tableBody.innerHTML = ""; // Clear the table before inserting new data
+
+            products.forEach(product => {
+                const row = document.createElement("tr");
+                
+                row.innerHTML = `
+                    <td>${product.product_id}</td>
+                    <td>${product.product_name}</td>
+                    <td>${product.category}</td>
+                    <td>${product.discounted_price}</td>
+                    <td>${product.actual_price}</td>
+                    <td>${product.discount_percentage}</td>
+                    <td>${product.rating}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Search products by product name
+        async function searchProducts() {
+            const searchQuery = document.getElementById("search-bar").value;
+            const response = await fetch(`/product/search/name?name=${searchQuery}`);
+            const filteredProducts = await response.json();
+            displayProducts(filteredProducts);
+        }
+
+        // Initialize the page by fetching the products
+        window.onload = fetchProducts;
+    </script>
+</body>
+</html>
