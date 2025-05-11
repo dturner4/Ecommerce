@@ -15,20 +15,14 @@ def search_reviews_by_username(username: str, request: Request):
     
     # Manually convert _id to string and append to the reviews list
     for review in reviews_cursor:
-        review["_id"] = str(review["_id"])  # Convert ObjectId to string
+        review["_id"] = str(review["_id"]) 
         reviews.append(review)
     
     return reviews
 #http://127.0.0.1:8000/review/search/username?username=Manav
 
-"""
-@router.post("/", response_description="Add a new review", status_code=status.HTTP_201_CREATED, response_model=Review)
-def add_review(request: Request, review: Review):
-    review_data = review.dict()
-    new_review = request.app.database["reviews"].insert_one(review_data)
-    created_review = request.app.database["reviews"].find_one({"_id": new_review.inserted_id})
-    return created_review
-"""
+
+# GET /review/search/product - Search reviews by product name
 @router.post("/", response_description="Create a new product", status_code=status.HTTP_201_CREATED, response_model=Review)
 async def create_product(request: Request, review: Review = Body(...)):
     async with httpx.AsyncClient() as client:
@@ -50,7 +44,7 @@ async def create_product(request: Request, review: Review = Body(...)):
 
     return reveiw_data
 
-
+# GET /review/{review_id} - Get a review by ID
 @router.put("/{review_id}", response_description="Update a review", response_model=Review)
 def update_review(review_id: str, request: Request, review: ReviewUpdate):
     update_data = {k: v for k, v in review.dict().items() if v is not None}
@@ -64,7 +58,7 @@ def update_review(review_id: str, request: Request, review: ReviewUpdate):
 
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Review with ID {review_id} not found")
 
-
+# GET /review/{review_id} - Get a review by ID
 @router.delete("/{review_id}", response_description="Delete a review")
 def delete_review(review_id: str, request: Request, response: Response):
     delete_result = request.app.database["reviews"].delete_one({"review_id": review_id})

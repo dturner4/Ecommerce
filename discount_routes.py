@@ -48,7 +48,7 @@ def search_discount_by_product_id(product_id: str, request: Request):
         discounts.append(discount)
     return discounts
 
-""""""
+# GET /discount/{product_id} - Get a discount by product_id, used by other services
 @router.get("/{product_id}", response_description="Get a product by product_id", response_model=Discount)
 def get_product_by_product_id(product_id: str, request: Request):
     product = request.app.database["discounts"].find_one({"product_id": product_id})

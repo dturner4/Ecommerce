@@ -7,15 +7,6 @@ import httpx
 router = APIRouter()
 
 # POST /order - Create a new order
-""""
-@router.post("/", response_description="Create a new order", status_code=201, response_model=Order)
-def create_order(request: Request, order: Order = Body(...)):
-    order_data = order.dict()
-    new_order = request.app.database["orders"].insert_one(order_data)
-    created_order = request.app.database["orders"].find_one({"_id": new_order.inserted_id})
-    return created_order
-"""
-#
 @router.post("/", response_description="Create a new order", status_code=status.HTTP_201_CREATED, response_model=Order)
 async def create_order(request: Request, order: Order = Body(...)):
     # 1. Use httpx to make async requests
@@ -53,7 +44,6 @@ async def create_order(request: Request, order: Order = Body(...)):
     order_data["_id"] = str(order_data["order_id"])
 
     return order_data
-#"""
 
 # GET /order/{order_id} - Get an order by ID
 @router.get("/{order_id}", response_description="Get an order by id", response_model=Order)

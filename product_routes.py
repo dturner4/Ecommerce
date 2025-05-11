@@ -9,17 +9,6 @@ from models import Product, ProductUpdate
 router = APIRouter()
 
 # POST /product - Create a new product
-"""
-@router.post("/", response_description="Create a new product", status_code=status.HTTP_201_CREATED, response_model=Product)
-def create_product(request: Request, product: Product = Body(...)):
-    product = jsonable_encoder(product)
-    new_product = request.app.database["products"].insert_one(product)
-    created_product = request.app.database["products"].find_one({"_id": new_product.inserted_id})
-    return created_product
-"""
-#POST http://127.0.0.1:8000/product?product_id=B09F6S8BT6&product_name=Samsung%20TV&category=Electronics&discounted_price=₹13,490&actual_price=₹22,900&discount_percentage=41%&rating=4.3&rating_count=16299&about_product=HD%20Ready%20TV&img_link=https://image-link.com&product_link=https://product-link.com
-
-
 @router.post("/", response_description="Create a new product", status_code=status.HTTP_201_CREATED, response_model=Product)
 async def create_product(request: Request, product: Product = Body(...)):
     async with httpx.AsyncClient() as client:
@@ -46,19 +35,7 @@ async def create_product(request: Request, product: Product = Body(...)):
 
     return created_product  
 
-
-
-"""
-# GET /product/{id} - Get a product by ID
-@router.get("/{id}", response_description="Get a product by id", response_model=Product)
-def find_product(id: str, request: Request):
-    if (product := request.app.database["products"].find_one({"_id": id})) is not None:
-        return product
-    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with ID {id} not found")
-"""
-
 # PUT /product/{id} - Update a product by ID
-
 @router.put("/{id}", response_description="Update a product", response_model=Product)
 def update_product(id: str, request: Request, product: ProductUpdate = Body(...)):
     product_data = {k: v for k, v in product.dict().items() if v is not None}
@@ -88,44 +65,45 @@ def delete_product(id: str, request: Request, response: Response):
 # GET /product - List all products
 @router.get("/", response_description="List all products", response_model=List[Product])
 def list_products(request: Request):
-    #products = list(request.app.database["products"].find(limit=100))
     #return products
     products_cursor = request.app.database["products"].find(limit=100)
     
     # Convert the ObjectId to a string manually
     products = []
     for product in products_cursor:
-        product["_id"] = str(product["_id"])  # Manually convert ObjectId to string
+        product["_id"] = str(product["_id"])
         products.append(product)
     
     return products
 
-
+# GET /product/search/name - Search products by name
 @router.get("/search/name", response_description="Search products by name", response_model=List[Product])
 def search_by_name(name: str, request: Request):
     # Use a regular expression to search for products by name
     products_cursor = list(request.app.database["products"].find({"product_name": {"$regex": name, "$options": "i"}}))
     products = []
     for product in products_cursor:
-        product["_id"] = str(product["_id"])  # Manually convert ObjectId to string
+        product["_id"] = str(product["_id"])
         products.append(product)
     return products
 
+# GET /product/search/category - Search products by category
 @router.get("/search/category", response_description="Search products by category", response_model=List[Product])
 def search_by_category(category: str, request: Request):
     products_cursor = list(request.app.database["products"].find({"category": {"$regex": category, "$options": "i"}}))
     products = []
     for product in products_cursor:
-        product["_id"] = str(product["_id"])  # Manually convert ObjectId to string
+        product["_id"] = str(product["_id"])
         products.append(product)
     return products
 
+# GET /product/search/discount - Search products by product_id
 @router.get("/{product_id}", response_description="Get a product by product_id", response_model=Product)
 def get_product_by_product_id(product_id: str, request: Request):
     # Find the product by product_id in the database
     product = request.app.database["products"].find_one({"product_id": product_id})
     if product:
-        product["_id"] = str(product["_id"])  # Manually convert ObjectId to string
+        product["_id"] = str(product["_id"])
         return product
     # If the product is not found, raise a 404 error
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with product_id {product_id} not found")

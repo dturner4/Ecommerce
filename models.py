@@ -8,6 +8,7 @@ from datetime import datetime
 def str_id(obj: ObjectId) -> str:
     return str(obj)
 
+# This is a base model for the Product information
 class Product(BaseModel):
     product_id: str
     product_name: str
@@ -27,7 +28,7 @@ class Product(BaseModel):
             ObjectId: str_id
         }
 
-
+# This is a base model for the Product information for updating the product
 class ProductUpdate(BaseModel):
     product_name: Optional[str]
     category: Optional[str]
@@ -40,6 +41,7 @@ class ProductUpdate(BaseModel):
     img_link: Optional[str]
     product_link: Optional[str]
 
+# This is a base model for the Review information
 class Review(BaseModel):
     review_id: str
     user_id: str
@@ -50,6 +52,7 @@ class Review(BaseModel):
     img_link: str = None
     product_id: str
 
+# This is a base model for the Review information for updating the review
 class ReviewUpdate(BaseModel):
     review_title: Optional[str] = None
     review_content: Optional[str] = None
@@ -57,7 +60,7 @@ class ReviewUpdate(BaseModel):
     img_link: Optional[str] = None
     product_id: Optional[str] = None
 
-
+# This is a base model for the Discount information
 class Discount(BaseModel):
     product_id: str
     product_name: str
@@ -65,6 +68,7 @@ class Discount(BaseModel):
     discount_percentage: str
     discounted_price: str
 
+# This is a base model for the Discount information for updating the discount
 class DiscountUpdate(BaseModel):
     product_name: Optional[str] = None
     actual_price: Optional[str] = None
@@ -72,7 +76,7 @@ class DiscountUpdate(BaseModel):
     discounted_price: Optional[str] = None
 
 
-
+# This is a base model for the Order information
 class Order(BaseModel):
     user_id: str
     order_id: str
@@ -84,8 +88,10 @@ class Order(BaseModel):
     delivery_date: datetime = None
     class Config:
         json_encoders = {
-            ObjectId: str  # Convert ObjectId to string when returning it in the response
+            ObjectId: str
         }
+
+# This is a base model for the Order information for updating the order
 class OrderUpdate(BaseModel):
     product_ordered: Optional[str] = None
     quantity: Optional[int] = None
