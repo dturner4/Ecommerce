@@ -1,6 +1,5 @@
 # models.py
-import uuid
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from bson import ObjectId 
 from typing import Optional
 from datetime import datetime

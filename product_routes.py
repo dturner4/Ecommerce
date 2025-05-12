@@ -1,8 +1,6 @@
 # pymongo-fastapi-crud/routes.py
 from fastapi import APIRouter, Body, Request, Response, HTTPException, status
-from fastapi.encoders import jsonable_encoder
-from typing import List, Optional
-import httpx
+from typing import List
 
 from models import Product, ProductUpdate
 
@@ -65,10 +63,7 @@ def delete_product(id: str, request: Request, response: Response):
 # GET /product - List all products
 @router.get("/", response_description="List all products", response_model=List[Product])
 def list_products(request: Request):
-    #return products
     products_cursor = request.app.database["products"].find(limit=100)
-    
-    # Convert the ObjectId to a string manually
     products = []
     for product in products_cursor:
         product["_id"] = str(product["_id"])
@@ -79,7 +74,6 @@ def list_products(request: Request):
 # GET /product/search/name - Search products by name
 @router.get("/search/name", response_description="Search products by name", response_model=List[Product])
 def search_by_name(name: str, request: Request):
-    # Use a regular expression to search for products by name
     products_cursor = list(request.app.database["products"].find({"product_name": {"$regex": name, "$options": "i"}}))
     products = []
     for product in products_cursor:
@@ -97,15 +91,13 @@ def search_by_category(category: str, request: Request):
         products.append(product)
     return products
 
-# GET /product/search/discount - Search products by product_id
+# GET /product/product_id - Search products by product_id
 @router.get("/{product_id}", response_description="Get a product by product_id", response_model=Product)
 def get_product_by_product_id(product_id: str, request: Request):
-    # Find the product by product_id in the database
     product = request.app.database["products"].find_one({"product_id": product_id})
     if product:
         product["_id"] = str(product["_id"])
         return product
-    # If the product is not found, raise a 404 error
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with product_id {product_id} not found")
 
 #http://127.0.0.1:8000/product/search/category?category=Electronics

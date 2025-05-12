@@ -57,7 +57,3 @@ def get_product_by_product_id(product_id: str, request: Request):
         return product
     # If the product is not found, raise a 404 error
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with product_id {product_id} not found")
-
-
-
-#http://127.0.0.1:8000/discount/search/product_id?product_id=B07JW9H4J1

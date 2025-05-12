@@ -2,14 +2,13 @@ from fastapi import APIRouter, HTTPException, Request, Body, status
 from typing import List
 from models import Order, OrderUpdate
 from datetime import datetime
-import requests
 import httpx
 router = APIRouter()
 
 # POST /order - Create a new order
 @router.post("/", response_description="Create a new order", status_code=status.HTTP_201_CREATED, response_model=Order)
 async def create_order(request: Request, order: Order = Body(...)):
-    # 1. Use httpx to make async requests
+    # Use httpx to make async requests
     async with httpx.AsyncClient() as client:
         # Query Product Service to get product details
         product_url = f"http://127.0.0.1:8000/product/{order.product_id}"
@@ -31,16 +30,14 @@ async def create_order(request: Request, order: Order = Body(...)):
         discount_data = discount_response.json()
 
     # Calculate total cost after discount
-    discounted_price = float(discount_data['discounted_price'][1:].replace(',', ''))  # Remove ₹ and commas
+    discounted_price = float(discount_data['discounted_price'][1:].replace(',', '')) 
     total_cost = discounted_price * order.quantity
 
-    # 3. Add order to the database (mocked here for demonstration)
     order_data = order.dict()
     order_data["total_cost"] = total_cost
     order_data["delivery_status"] = "Pending"
     order_data["delivery_date"] = datetime.now()
 
-    # Simulate saving the order (e.g., insert into DB)
     order_data["_id"] = str(order_data["order_id"])
 
     return order_data
@@ -82,7 +79,7 @@ def search_orders_by_user_id(user_id: str, request: Request):
     orders_cursor = list(request.app.database["orders"].find({"user_id": {"$regex": user_id, "$options": "i"}}))
     orders = []
     for order in orders_cursor:
-        order["_id"] = str(order["_id"])  # Convert ObjectId to string
+        order["_id"] = str(order["_id"])
         orders.append(order)
     return orders
 
