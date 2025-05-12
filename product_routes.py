@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/", response_description="Create a new product", status_code=status.HTTP_201_CREATED, response_model=Product)
 async def create_product(request: Request, product: Product = Body(...)):
     async with httpx.AsyncClient() as client:
-        # Query Product Service to get product details
+        # Query Discount Service to get price details
         discount_url = f"http://127.0.0.1:8000/discount/{product.product_id}"
         discount_response = await client.get(discount_url)
         if discount_response.status_code != 200:
