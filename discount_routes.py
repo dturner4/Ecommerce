@@ -53,7 +53,6 @@ def search_discount_by_product_id(product_id: str, request: Request):
 def get_product_by_product_id(product_id: str, request: Request):
     product = request.app.database["discounts"].find_one({"product_id": product_id})
     if product:
-        product["_id"] = str(product["_id"])  # Manually convert ObjectId to string
+        product["_id"] = str(product["_id"])
         return product
-    # If the product is not found, raise a 404 error
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Product with product_id {product_id} not found")
